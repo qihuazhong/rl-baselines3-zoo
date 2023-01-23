@@ -80,3 +80,9 @@ Acrobot-v1:
   exploration_fraction: 0.12
   exploration_final_eps: 0.1
   policy_kwargs: "dict(net_arch=[256, 256])"
+
+BeerGameUniformRetailerDiscreteDPlusA-v0:
+  normalize: "{'norm_obs': True, 'norm_reward': True, 'clip_obs': 100, 'clip_reward': 1000}"
+  n_timesteps: 100000
+  policy: 'MlpPolicy'
+

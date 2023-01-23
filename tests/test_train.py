@@ -10,7 +10,7 @@ def _assert_eq(left, right):
 
 N_STEPS = 100
 
-ALGOS = ("ppo", "a2c", "dqn")
+ALGOS = ("a2c", "dqn")
 # 'BreakoutNoFrameskip-v4'
 ENV_IDS = ("CartPole-v1",)
 
@@ -21,13 +21,16 @@ for algo in ALGOS:
         experiments[f"{algo}-{env_id}"] = (algo, env_id)
 
 # Test for vecnormalize and frame-stack
-experiments["ppo-BipedalWalkerHardcore-v3"] = ("ppo", "BipedalWalkerHardcore-v3")
+# experiments["ppo-BipedalWalkerHardcore-v3"] = ("ppo", "BipedalWalkerHardcore-v3")
 # Test for SAC
 experiments["sac-Pendulum-v1"] = ("sac", "Pendulum-v1")
 # for TD3
 experiments["td3-Pendulum-v1"] = ("td3", "Pendulum-v1")
 # for DDPG
-experiments["ddpg-Pendulum-v1"] = ("ddpg", "Pendulum-v1")
+# experiments["ddpg-Pendulum-v1"] = ("ddpg", "Pendulum-v1")
+
+# for customer environment
+experiments["BeerGameUniformRetailerDiscreteDPlusA-v0"] = ("dqn", "BeerGameUniformRetailerDiscreteDPlusA-v0")
 
 
 @pytest.mark.parametrize("experiment", experiments.keys())

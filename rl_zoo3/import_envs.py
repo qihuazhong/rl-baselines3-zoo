@@ -2,6 +2,8 @@ import gym
 from gym.envs.registration import register
 
 from rl_zoo3.wrappers import MaskVelocityWrapper
+import sys
+import os
 
 try:
     import pybullet_envs  # pytype: disable=import-error
@@ -60,3 +62,8 @@ for env_id in MaskVelocityWrapper.velocity_indices.keys():
         id=f"{name}NoVel-v{version}",
         entry_point=create_no_vel_env(env_id),
     )
+
+sys.path.append(os.path.abspath(os.path.join('..'))+"/")
+from snim.register_envs import register_envs
+
+register_envs()
