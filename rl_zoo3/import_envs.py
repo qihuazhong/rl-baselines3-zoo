@@ -63,7 +63,7 @@ for env_id in MaskVelocityWrapper.velocity_indices.keys():
         entry_point=create_no_vel_env(env_id),
     )
 
-sys.path.append(os.path.abspath(os.path.join('..'))+"/")
-from snim.register_envs import register_envs
+sys.path.append(os.path.abspath(os.path.join("../snim")) + "/")
+from register_envs import register_envs
 
 register_envs()
