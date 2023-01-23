@@ -151,32 +151,37 @@ def sample_a2c_params(trial: optuna.Trial) -> Dict[str, Any]:
     :param trial:
     :return:
     """
-    gamma = trial.suggest_categorical("gamma", [0.9, 0.95, 0.98, 0.99, 0.995, 0.999, 0.9999])
-    normalize_advantage = trial.suggest_categorical("normalize_advantage", [False, True])
-    max_grad_norm = trial.suggest_categorical("max_grad_norm", [0.3, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 2, 5])
+    gamma = trial.suggest_categorical("gamma", [0.95, 0.98, 0.99])
+    normalize_advantage = trial.suggest_categorical("normalize_advantage", [False])
+    max_grad_norm = trial.suggest_categorical("max_grad_norm", [0.3, 0.5, 1, 2, 5])
     # Toggle PyTorch RMS Prop (different from TF one, cf doc)
-    use_rms_prop = trial.suggest_categorical("use_rms_prop", [False, True])
-    gae_lambda = trial.suggest_categorical("gae_lambda", [0.8, 0.9, 0.92, 0.95, 0.98, 0.99, 1.0])
-    n_steps = trial.suggest_categorical("n_steps", [8, 16, 32, 64, 128, 256, 512, 1024, 2048])
-    lr_schedule = trial.suggest_categorical("lr_schedule", ["linear", "constant"])
-    learning_rate = trial.suggest_loguniform("learning_rate", 1e-5, 1)
+    use_rms_prop = trial.suggest_categorical("use_rms_prop", [True])
+    gae_lambda = trial.suggest_categorical("gae_lambda", [0.95, 0.98, 0.99])
+    n_steps = trial.suggest_categorical("n_steps", [8, 32, 128])
+    lr_schedule = trial.suggest_categorical("lr_schedule", ["constant"])
+    learning_rate = trial.suggest_categorical("learning_rate", [1e-4, 3e-4, 1e-3])
     ent_coef = trial.suggest_loguniform("ent_coef", 0.00000001, 0.1)
     vf_coef = trial.suggest_uniform("vf_coef", 0, 1)
     # Uncomment for gSDE (continuous actions)
     # log_std_init = trial.suggest_uniform("log_std_init", -4, 1)
-    ortho_init = trial.suggest_categorical("ortho_init", [False, True])
-    net_arch = trial.suggest_categorical("net_arch", ["small", "medium"])
+    ortho_init = trial.suggest_categorical("ortho_init", [True])
+    net_arch = trial.suggest_categorical("net_arch",
+                                         ["small", "medium", "big", "small_deep", "medium_deep", "big_deep"])
     # sde_net_arch = trial.suggest_categorical("sde_net_arch", [None, "tiny", "small"])
     # full_std = trial.suggest_categorical("full_std", [False, True])
     # activation_fn = trial.suggest_categorical('activation_fn', ['tanh', 'relu', 'elu', 'leaky_relu'])
-    activation_fn = trial.suggest_categorical("activation_fn", ["tanh", "relu"])
+    activation_fn = trial.suggest_categorical("activation_fn", ["tanh"])
 
     if lr_schedule == "linear":
         learning_rate = linear_schedule(learning_rate)
 
     net_arch = {
-        "small": dict(pi=[64, 64], vf=[64, 64]),
-        "medium": dict(pi=[256, 256], vf=[256, 256]),
+        "small": [dict(pi=[64, 64], vf=[64, 64])],
+        "medium": [dict(pi=[128, 128], vf=[128, 128])],
+        "big": [dict(pi=[256, 256], vf=[256, 256])],
+        "small_deep": [dict(pi=[64, 64, 64], vf=[64, 64, 64])],
+        "medium_deep": [dict(pi=[128, 128, 128], vf=[128, 128, 128])],
+        "big_deep": [dict(pi=[256, 256, 256], vf=[256, 256, 256])]
     }[net_arch]
 
     # sde_net_arch = {
@@ -276,30 +281,34 @@ def sample_td3_params(trial: optuna.Trial) -> Dict[str, Any]:
     :param trial:
     :return:
     """
-    gamma = trial.suggest_categorical("gamma", [0.9, 0.95, 0.98, 0.99, 0.995, 0.999, 0.9999])
-    learning_rate = trial.suggest_loguniform("learning_rate", 1e-5, 1)
-    batch_size = trial.suggest_categorical("batch_size", [16, 32, 64, 100, 128, 256, 512, 1024, 2048])
-    buffer_size = trial.suggest_categorical("buffer_size", [int(1e4), int(1e5), int(1e6)])
+    gamma = trial.suggest_categorical("gamma", [0.95, 0.98, 0.99])
+    learning_rate = trial.suggest_categorical("learning_rate", [1e-4, 3e-4, 1e-3])
+    batch_size = trial.suggest_categorical("batch_size", [32, 128, 512])
+    buffer_size = trial.suggest_categorical("buffer_size", [int(1e6)])
     # Polyak coeff
-    tau = trial.suggest_categorical("tau", [0.001, 0.005, 0.01, 0.02, 0.05, 0.08])
+    tau = trial.suggest_categorical("tau", [0.01, 0.02])
 
-    train_freq = trial.suggest_categorical("train_freq", [1, 4, 8, 16, 32, 64, 128, 256, 512])
+    train_freq = trial.suggest_categorical("train_freq", [1, 8, 32, 128])
     gradient_steps = train_freq
 
-    noise_type = trial.suggest_categorical("noise_type", ["ornstein-uhlenbeck", "normal", None])
-    noise_std = trial.suggest_uniform("noise_std", 0, 1)
+    noise_type = trial.suggest_categorical("noise_type", ["normal"])
+    noise_std = trial.suggest_categorical("noise_std", [0.1, 0.2, 0.3, 0.4])
 
     # NOTE: Add "verybig" to net_arch when tuning HER
-    net_arch = trial.suggest_categorical("net_arch", ["small", "medium", "big"])
+    net_arch = trial.suggest_categorical("net_arch",
+                                         ["big", "small", "medium", "big_deep", "small_deep", "medium_deep"])
     # activation_fn = trial.suggest_categorical('activation_fn', [nn.Tanh, nn.ReLU, nn.ELU, nn.LeakyReLU])
 
-    net_arch = {
-        "small": [64, 64],
-        "medium": [256, 256],
-        "big": [400, 300],
-        # Uncomment for tuning HER
-        # "verybig": [256, 256, 256],
-    }[net_arch]
+    net_arch = {"medium": [128, 128], "small": [64, 64], "big": [256, 256], "medium_deep": [128, 128, 128],
+                "small_deep": [64, 64, 64], "big_deep": [256, 256, 256]}[net_arch]
+
+    # net_arch = {
+    #     "small": [64, 64],
+    #     "medium": [256, 256],
+    #     "big": [400, 300],
+    #     # Uncomment for tuning HER
+    #     # "verybig": [256, 256, 256],
+    # }[net_arch]
 
     hyperparams = {
         "gamma": gamma,
@@ -390,22 +399,24 @@ def sample_dqn_params(trial: optuna.Trial) -> Dict[str, Any]:
     :param trial:
     :return:
     """
-    gamma = trial.suggest_categorical("gamma", [0.9, 0.95, 0.98, 0.99, 0.995, 0.999, 0.9999])
-    learning_rate = trial.suggest_loguniform("learning_rate", 1e-5, 1)
-    batch_size = trial.suggest_categorical("batch_size", [16, 32, 64, 100, 128, 256, 512])
-    buffer_size = trial.suggest_categorical("buffer_size", [int(1e4), int(5e4), int(1e5), int(1e6)])
-    exploration_final_eps = trial.suggest_uniform("exploration_final_eps", 0, 0.2)
-    exploration_fraction = trial.suggest_uniform("exploration_fraction", 0, 0.5)
-    target_update_interval = trial.suggest_categorical("target_update_interval", [1, 1000, 5000, 10000, 15000, 20000])
-    learning_starts = trial.suggest_categorical("learning_starts", [0, 1000, 5000, 10000, 20000])
+    gamma = trial.suggest_categorical("gamma", [0.95, 0.98, 0.99])
+    learning_rate = trial.suggest_categorical("learning_rate", [1e-4, 3e-4, 1e-3])
+    batch_size = trial.suggest_categorical("batch_size", [32, 128, 512])
+    buffer_size = trial.suggest_categorical("buffer_size", [int(5e4), int(1e5), int(1e6)])
+    exploration_final_eps = trial.suggest_categorical("exploration_final_eps", [0.15])
+    exploration_fraction = trial.suggest_categorical("exploration_fraction", [0.2])
+    target_update_interval = trial.suggest_categorical("target_update_interval", [1, 100, 500, 1000])
+    learning_starts = trial.suggest_categorical("learning_starts", [50000])
 
-    train_freq = trial.suggest_categorical("train_freq", [1, 4, 8, 16, 128, 256, 1000])
+    train_freq = trial.suggest_categorical("train_freq", [1, 8, 32, 128])
     subsample_steps = trial.suggest_categorical("subsample_steps", [1, 2, 4, 8])
     gradient_steps = max(train_freq // subsample_steps, 1)
 
-    net_arch = trial.suggest_categorical("net_arch", ["tiny", "small", "medium"])
+    net_arch = trial.suggest_categorical("net_arch",
+                                         ["big", "small", "medium", "big_deep", "small_deep", "medium_deep"])
 
-    net_arch = {"tiny": [64], "small": [64, 64], "medium": [256, 256]}[net_arch]
+    net_arch = {"medium": [128, 128], "small": [64, 64], "big": [256, 256], "medium_deep": [128, 128, 128],
+                "small_deep": [64, 64, 64], "big_deep": [256, 256, 256]}[net_arch]
 
     hyperparams = {
         "gamma": gamma,
