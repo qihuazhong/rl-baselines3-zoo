@@ -165,8 +165,9 @@ def sample_a2c_params(trial: optuna.Trial) -> Dict[str, Any]:
     # Uncomment for gSDE (continuous actions)
     # log_std_init = trial.suggest_uniform("log_std_init", -4, 1)
     ortho_init = trial.suggest_categorical("ortho_init", [True])
-    net_arch = trial.suggest_categorical("net_arch",
-                                         ["small", "medium", "big", "small_deep", "medium_deep", "big_deep"])
+    net_arch = trial.suggest_categorical(
+        "net_arch", ["small", "medium", "big", "small_deep", "medium_deep", "big_deep"]
+    )
     # sde_net_arch = trial.suggest_categorical("sde_net_arch", [None, "tiny", "small"])
     # full_std = trial.suggest_categorical("full_std", [False, True])
     # activation_fn = trial.suggest_categorical('activation_fn', ['tanh', 'relu', 'elu', 'leaky_relu'])
@@ -181,7 +182,7 @@ def sample_a2c_params(trial: optuna.Trial) -> Dict[str, Any]:
         "big": [dict(pi=[256, 256], vf=[256, 256])],
         "small_deep": [dict(pi=[64, 64, 64], vf=[64, 64, 64])],
         "medium_deep": [dict(pi=[128, 128, 128], vf=[128, 128, 128])],
-        "big_deep": [dict(pi=[256, 256, 256], vf=[256, 256, 256])]
+        "big_deep": [dict(pi=[256, 256, 256], vf=[256, 256, 256])],
     }[net_arch]
 
     # sde_net_arch = {
@@ -295,12 +296,19 @@ def sample_td3_params(trial: optuna.Trial) -> Dict[str, Any]:
     noise_std = trial.suggest_categorical("noise_std", [0.1, 0.2, 0.3, 0.4])
 
     # NOTE: Add "verybig" to net_arch when tuning HER
-    net_arch = trial.suggest_categorical("net_arch",
-                                         ["big", "small", "medium", "big_deep", "small_deep", "medium_deep"])
+    net_arch = trial.suggest_categorical(
+        "net_arch", ["big", "small", "medium", "big_deep", "small_deep", "medium_deep"]
+    )
     # activation_fn = trial.suggest_categorical('activation_fn', [nn.Tanh, nn.ReLU, nn.ELU, nn.LeakyReLU])
 
-    net_arch = {"medium": [128, 128], "small": [64, 64], "big": [256, 256], "medium_deep": [128, 128, 128],
-                "small_deep": [64, 64, 64], "big_deep": [256, 256, 256]}[net_arch]
+    net_arch = {
+        "medium": [128, 128],
+        "small": [64, 64],
+        "big": [256, 256],
+        "medium_deep": [128, 128, 128],
+        "small_deep": [64, 64, 64],
+        "big_deep": [256, 256, 256],
+    }[net_arch]
 
     # net_arch = {
     #     "small": [64, 64],
@@ -402,7 +410,7 @@ def sample_dqn_params(trial: optuna.Trial) -> Dict[str, Any]:
     gamma = trial.suggest_categorical("gamma", [0.95, 0.98, 0.99])
     learning_rate = trial.suggest_categorical("learning_rate", [1e-4, 3e-4, 1e-3])
     batch_size = trial.suggest_categorical("batch_size", [32, 128, 512])
-    buffer_size = trial.suggest_categorical("buffer_size", [int(5e4), int(1e5), int(1e6)])
+    buffer_size = trial.suggest_categorical("buffer_size", [int(1e6)])
     exploration_final_eps = trial.suggest_categorical("exploration_final_eps", [0.15])
     exploration_fraction = trial.suggest_categorical("exploration_fraction", [0.2])
     target_update_interval = trial.suggest_categorical("target_update_interval", [1, 100, 500, 1000])
@@ -412,11 +420,18 @@ def sample_dqn_params(trial: optuna.Trial) -> Dict[str, Any]:
     subsample_steps = trial.suggest_categorical("subsample_steps", [1, 2, 4, 8])
     gradient_steps = max(train_freq // subsample_steps, 1)
 
-    net_arch = trial.suggest_categorical("net_arch",
-                                         ["big", "small", "medium", "big_deep", "small_deep", "medium_deep"])
+    net_arch = trial.suggest_categorical(
+        "net_arch", ["big", "small", "medium", "big_deep", "small_deep", "medium_deep"]
+    )
 
-    net_arch = {"medium": [128, 128], "small": [64, 64], "big": [256, 256], "medium_deep": [128, 128, 128],
-                "small_deep": [64, 64, 64], "big_deep": [256, 256, 256]}[net_arch]
+    net_arch = {
+        "medium": [128, 128],
+        "small": [64, 64],
+        "big": [256, 256],
+        "medium_deep": [128, 128, 128],
+        "small_deep": [64, 64, 64],
+        "big_deep": [256, 256, 256],
+    }[net_arch]
 
     hyperparams = {
         "gamma": gamma,
