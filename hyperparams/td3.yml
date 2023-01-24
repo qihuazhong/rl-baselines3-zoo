@@ -165,17 +165,17 @@ Swimmer-v3:
 
 BeerGameUniformRetailerDPlusA-v0:
   normalize: "{'norm_obs': True, 'norm_reward': True, 'clip_obs': 100, 'clip_reward': 1000}"
-  n_timesteps: 1000000
+  n_timesteps: 100_000
   policy: 'MlpPolicy'
 
 
 BeerGameUniformMultiFacilityDPlusA-v0:
   normalize: "{'norm_obs': True, 'norm_reward': True, 'clip_obs': 100, 'clip_reward': 1000}"
-  n_timesteps: 100000
+  n_timesteps: 100_000
   policy: 'MlpPolicy'
 
 
 BeerGameNormalMultiFacilityDPlusA-v0:
   normalize: "{'norm_obs': True, 'norm_reward': True, 'clip_obs': 100, 'clip_reward': 1000}"
-  n_timesteps: 100000
+  n_timesteps: 100_000
   policy: 'MlpPolicy'
