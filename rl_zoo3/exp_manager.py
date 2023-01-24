@@ -49,7 +49,14 @@ from torch import nn as nn  # noqa: F401
 import rl_zoo3.import_envs  # noqa: F401 pytype: disable=import-error
 from rl_zoo3.callbacks import SaveVecNormalizeCallback, TrialEvalCallback
 from rl_zoo3.hyperparams_opt import HYPERPARAMS_SAMPLER
-from rl_zoo3.utils import ALGOS, get_callback_list, get_class_by_name, get_latest_run_id, get_wrapper_class, linear_schedule
+from rl_zoo3.utils import (
+    ALGOS,
+    get_callback_list,
+    get_class_by_name,
+    get_latest_run_id,
+    get_wrapper_class,
+    linear_schedule,
+)
 
 
 class ExperimentManager:
@@ -698,7 +705,7 @@ class ExperimentManager:
         if pruner_method == "halving":
             pruner = SuccessiveHalvingPruner(min_resource=1, reduction_factor=4, min_early_stopping_rate=0)
         elif pruner_method == "median":
-            pruner = MedianPruner(n_startup_trials=self.n_startup_trials, n_warmup_steps=self.n_evaluations // 3)
+            pruner = MedianPruner(n_startup_trials=self.n_startup_trials, n_warmup_steps=self.n_timesteps // 2)
         elif pruner_method == "none":
             # Do not prune
             pruner = NopPruner()
