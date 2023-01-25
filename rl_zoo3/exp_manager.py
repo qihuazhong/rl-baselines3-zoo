@@ -752,7 +752,7 @@ class ExperimentManager:
 
         optuna_eval_freq = int(self.n_timesteps / self.n_evaluations)
         # Account for parallel envs
-        optuna_eval_freq = max(optuna_eval_freq // self.n_envs, 1)
+        optuna_eval_freq = max(optuna_eval_freq // self.n_eval_envs, 1)
         # Use non-deterministic eval for Atari
         path = None
         if self.optimization_log_path is not None:
