@@ -24,6 +24,7 @@ class TrialEvalCallback(EvalCallback):
         eval_env: VecEnv,
         trial: optuna.Trial,
         n_eval_episodes: int = 5,
+        learning_starts: int = 0,
         eval_freq: int = 10000,
         deterministic: bool = True,
         verbose: int = 0,
@@ -42,6 +43,7 @@ class TrialEvalCallback(EvalCallback):
         )
         self.trial = trial
         self.eval_idx = 0
+        self.learning_starts = learning_starts
         self.is_pruned = False
 
     def _on_step(self) -> bool:
@@ -52,7 +54,7 @@ class TrialEvalCallback(EvalCallback):
             # report num_timesteps or elasped time ?
             self.trial.report(self.last_mean_reward, self.eval_idx)
             # Prune trial if need
-            if self.trial.should_prune():
+            if self.trial.should_prune() and self.n_calls > self.learning_starts:
                 self.is_pruned = True
                 return False
         return True
