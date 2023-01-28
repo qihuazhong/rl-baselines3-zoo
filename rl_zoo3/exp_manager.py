@@ -453,7 +453,8 @@ class ExperimentManager:
         # Note: only off-policy algorithms are supported
 
         # Save for later (hyperparameter optimization)
-        self.n_actions = env.action_space.shape[0]
+        if isinstance(env.action_space, spaces.Box):
+            self.n_actions = env.action_space.shape[0]
 
         if hyperparams.get("noise_type") is not None:
             noise_type = hyperparams["noise_type"].strip()
