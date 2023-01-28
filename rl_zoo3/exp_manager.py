@@ -451,12 +451,13 @@ class ExperimentManager:
     ) -> Dict[str, Any]:
         # Parse noise string
         # Note: only off-policy algorithms are supported
+
+        # Save for later (hyperparameter optimization)
+        self.n_actions = env.action_space.shape[0]
+
         if hyperparams.get("noise_type") is not None:
             noise_type = hyperparams["noise_type"].strip()
             noise_std = hyperparams["noise_std"]
-
-            # Save for later (hyperparameter optimization)
-            self.n_actions = env.action_space.shape[0]
 
             if "normal" in noise_type:
                 hyperparams["action_noise"] = NormalActionNoise(
