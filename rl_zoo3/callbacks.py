@@ -25,7 +25,6 @@ class TrialEvalCallback(EvalCallback):
         trial: optuna.Trial,
         n_eval_episodes: int = 5,
         eval_freq: int = 10000,
-        learning_starts: int = 0,
         deterministic: bool = True,
         verbose: int = 0,
         best_model_save_path: Optional[str] = None,
@@ -43,15 +42,10 @@ class TrialEvalCallback(EvalCallback):
         )
         self.trial = trial
         self.eval_idx = 0
-        self.learning_starts = learning_starts
         self.is_pruned = False
 
     def _on_step(self) -> bool:
-        if (
-            self.eval_freq > 0
-            and self.n_calls >= self.learning_starts
-            and (self.n_calls - self.learning_starts) % self.eval_freq == 0
-        ):
+        if self.eval_freq > 0 and self.n_calls % self.eval_freq == 0:
             super()._on_step()
             self.eval_idx += 1
             # report best or report current ?

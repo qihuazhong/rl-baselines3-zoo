@@ -29,7 +29,6 @@ from stable_baselines3.common.base_class import BaseAlgorithm
 from stable_baselines3.common.callbacks import BaseCallback, CheckpointCallback, EvalCallback, ProgressBarCallback
 from stable_baselines3.common.env_util import make_vec_env
 from stable_baselines3.common.noise import NormalActionNoise, OrnsteinUhlenbeckActionNoise
-from stable_baselines3.common.off_policy_algorithm import OffPolicyAlgorithm
 from stable_baselines3.common.preprocessing import is_image_space, is_image_space_channels_first
 from stable_baselines3.common.sb2_compat.rmsprop_tf_like import RMSpropTFLike  # noqa: F401
 from stable_baselines3.common.utils import constant_fn
@@ -746,13 +745,7 @@ class ExperimentManager:
 
         eval_env = self.create_envs(n_envs=self.n_eval_envs, eval_env=True)
 
-        # Starts evaluation only after learning_starts step
-        learning_starts = model.learning_starts if isinstance(model, OffPolicyAlgorithm) else 0
-
-        assert (
-            self.n_timesteps > learning_starts
-        ), f"n_timesteps={self.n_timesteps} is not greater than learning_starts={learning_starts}, the optimization will stop before learning starts"
-        optuna_eval_freq = int((self.n_timesteps - learning_starts) / self.n_evaluations)
+        optuna_eval_freq = int(self.n_timesteps / self.n_evaluations)
         # Account for parallel envs
         optuna_eval_freq = max(optuna_eval_freq // self.n_envs, 1)
         # Use non-deterministic eval for Atari
@@ -767,7 +760,6 @@ class ExperimentManager:
             log_path=path,
             n_eval_episodes=self.n_eval_episodes,
             eval_freq=optuna_eval_freq,
-            learning_starts=learning_starts,
             deterministic=self.deterministic_eval,
         )
         callbacks.append(eval_callback)
