@@ -26,6 +26,7 @@ from sb3_contrib.common.vec_env import AsyncEval
 # For using HER with GoalEnv
 from stable_baselines3 import HerReplayBuffer  # noqa: F401
 from stable_baselines3.common.base_class import BaseAlgorithm
+from stable_baselines3.common.off_policy_algorithm import OffPolicyAlgorithm
 from stable_baselines3.common.callbacks import BaseCallback, CheckpointCallback, EvalCallback, ProgressBarCallback
 from stable_baselines3.common.env_util import make_vec_env
 from stable_baselines3.common.noise import NormalActionNoise, OrnsteinUhlenbeckActionNoise
@@ -745,6 +746,8 @@ class ExperimentManager:
 
         eval_env = self.create_envs(n_envs=self.n_eval_envs, eval_env=True)
 
+        learning_starts = model.learning_starts if isinstance(model, OffPolicyAlgorithm) else 0
+
         optuna_eval_freq = int(self.n_timesteps / self.n_evaluations)
         # Account for parallel envs
         optuna_eval_freq = max(optuna_eval_freq // self.n_envs, 1)
@@ -759,6 +762,7 @@ class ExperimentManager:
             best_model_save_path=path,
             log_path=path,
             n_eval_episodes=self.n_eval_episodes,
+            learning_starts=learning_starts,
             eval_freq=optuna_eval_freq,
             deterministic=self.deterministic_eval,
         )
